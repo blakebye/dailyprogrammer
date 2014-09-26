@@ -9,27 +9,17 @@ eq_2 = raw_input("Equation 2: y=")
 p = re.compile("(-?)\s*(\d*.?\d*)x\^(-?\d*/?\d*\.?\d*)|"\
                "(-?)\s*(\d*\.?\d*)x(?!\^)|"\
                "(?<!\^)(-?)\s*(\d*\.?\d+)(?![x\.])")
-poly = re.findall(p, eq_1)
 
-for term in range(len(poly)):
-    if "/" in poly[term][2]:
-        print "THIS PROGRAM WON'T WORK ON FRACTIONAL POWERS"
-        sys.exit()
+polys = (re.findall(p, eq_1), re.findall(p, eq_2))
+for poly in polys:
+    for term in range(len(poly)):
+        if "." in poly[term][2] or "/" in poly[term][2]:
+            print "THIS PROGRAM WON'T WORK ON FRACTIONAL POWERS"
+            sys.exit()
 
-    if poly[term][2] != "" and int(poly[term][2]) < 0:
-        print "THIS PROGRAM WON'T WORK ON NEGATIVE POWERS"
-        sys.exit()
-
-poly = re.findall(p, eq_2)
-
-for term in range(len(poly)):
-    if "/" in poly[term][2]:
-        print "THIS PROGRAM WON'T WORK ON FRACTIONAL POWERS"
-        sys.exit()
-
-    if poly[term][2] != "" and int(poly[term][2]) < 0:
-        print "THIS PROGRAM WON'T WORK ON NEGATIVE POWERS"
-        sys.exit()
+        if poly[term][2] != "" and int(poly[term][2]) < 0:
+            print "THIS PROGRAM WON'T WORK ON NEGATIVE POWERS"
+            sys.exit()
 
 
 orders = [0, 1]
