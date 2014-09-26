@@ -33,9 +33,12 @@ for order in orders:
     term = 0
     for eq in (eq_1, eq_2):
         co = 0
-        if order not in (0, 1):
-            expr = re.compile(r"(-?)\s*(\d*\.?\d*)x\^{}".format(order))
-            split = []
+        split = []
+        if order != 0:
+            if order == 1:
+                expr = re.compile(r"(-?)\s*(\d*\.?\d*)x(?!\^)")
+            else:
+                expr = re.compile(r"(-?)\s*(\d*\.?\d*)x\^{}".format(order))
             for pair in re.findall(expr, eq):
                 split.extend(list(pair))
             for element in split:
@@ -43,47 +46,22 @@ for order in orders:
                     split[split.index(element)] = "+"
                 elif element == '':
                     split[split.index(element)] = 1
-            for element in split:
-                if element == '+':
-                    co += float(split[split.index(element) + 1])
-                    split[split.index(element)] = " "
-                elif element == '-':
-                    co -= float(split[split.index(element) + 1])
-                    split[split.index(element)] = " "
-        
+
         elif order == 0:
             expr = re.compile(r"(?<!\^)(-?)\s*(\d*\.?\d+)(?![x\.])")
-            split = []
             for pair in re.findall(expr, eq):
                 split.extend(list(pair))
             for element in split:
                 if element == '':
                     split[split.index(element)] = "+"
-            for element in split:
-                if element == '+':
-                    co += float(split[split.index(element) + 1])
-                    split[split.index(element)] = " "
-                elif element == '-':
-                    co -= float(split[split.index(element) + 1])
-                    split[split.index(element)] = " "
-        
-        elif order == 1:
-            expr = re.compile(r"(-?)\s*(\d*\.?\d*)x(?!\^)")
-            split = []
-            for pair in re.findall(expr, eq):
-                split.extend(list(pair))
-            for element in split:
-                if split.index(element) % 2 == 0 and element == '':
-                    split[split.index(element)] = "+"
-                elif element == '':
-                    split[split.index(element)] = 1
-            for element in split:
-                if element == '+':
-                    co += float(split[split.index(element) + 1])
-                    split[split.index(element)] = " "
-                elif element == '-':
-                    co -= float(split[split.index(element) + 1])
-                    split[split.index(element)] = " "
+
+        for element in split:
+            if element == '+':
+                co += float(split[split.index(element) + 1])
+                split[split.index(element)] = " "
+            elif element == '-':
+                co -= float(split[split.index(element) + 1])
+                split[split.index(element)] = " "
         
         if eq is eq_1:
             term += co
@@ -111,65 +89,52 @@ elif max(orders) > 1:
     else:
         x_1 = (-b + math.sqrt(b ** 2 - 4 * a * c)) / (2 * a)
         x_2 = (-b - math.sqrt(b ** 2 - 4 * a * c)) / (2 * a)
-        if round(x_1, 4) == round(x_2, 4):
-            y = 0
-            for term in range(len(poly)):
-                if poly[term][2] != "" and poly[term][1] != "":
-                    value = x_1 * x_1 * float(poly[term][1])
-                    if poly[term][0] == "":
-                        y += value
-                    else:
-                        y -= value
-                if poly[term][2] != "" and poly[term][1] == "":
-                    value = x_1 * x_1
-                    if poly[term][0] == "":
-                        y += value
-                    else:
-                        y -= value
-                if poly[term][4] != "":
-                    value = x_1 * float(poly[term][4])
-                    if poly[term][3] == "":
-                        y += value
-                    else:
-                        y -= value
-                if poly[term][6] != "":
-                    value = float(poly[term][6])
-                    if poly[term][5] == "":
-                        y += value
-                    else:
-                        y -= value
-            print "({}, {})".format(x_1, y)
-        else:
+        y_1 = 0
+        if round(x_1, 4) != round(x_2, 4):
             print "Two solutions:"
-            y_1 = 0
-            for term in range(len(poly)):
-                if poly[term][2] != "" and poly[term][1] != "":
-                    value = x_1 * x_1 * float(poly[term][1])
-                    if poly[term][0] == "":
-                        y_1 += value
-                    else:
-                        y_1 -= value
-                if poly[term][2] != "" and poly[term][1] == "":
-                    value = x_1 * x_1
-                    if poly[term][0] == "":
-                        y_1 += value
-                    else:
-                        y_1 -= value
-                if poly[term][4] != "":
-                    value = x_1 * float(poly[term][4])
-                    if poly[term][3] == "":
-                        y_1 += value
-                    else:
-                        y_1 -= value
-                if poly[term][6] != "":
-                    value = float(poly[term][6])
-                    if poly[term][5] == "":
-                        y_1 += value
-                    else:
-                        y_1 -= value
-            print "({}, {})".format(x_1, y_1)
+        for term in range(len(poly)):
+            if (poly[term][0] == "" and poly[term][1] == "" and
+                poly[term][2] == "" and poly[term][4] == "" and
+                poly[term][5] == "" and poly[term][6] == ""):
+                if poly[term][3] == "":
+                    y_1 += x_1
+                else:
+                    y_1 -= x_1
+            if poly[term][2] != "" and poly[term][1] != "":
+                value = x_1 * x_1 * float(poly[term][1])
+                if poly[term][0] == "":
+                    y_1 += value
+                else:
+                    y_1 -= value
+            if poly[term][2] != "" and poly[term][1] == "":
+                value = x_1 * x_1
+                if poly[term][0] == "":
+                    y_1 += value
+                else:
+                    y_1 -= value
+            if poly[term][4] != "":
+                value = x_1 * float(poly[term][4])
+                if poly[term][3] == "":
+                    y_1 += value
+                else:
+                    y_1 -= value
+            if poly[term][6] != "":
+                value = float(poly[term][6])
+                if poly[term][5] == "":
+                    y_1 += value
+                else:
+                    y_1 -= value
+        print "({}, {})".format(float(x_1), float(y_1))
+        if round(x_1, 4) != round(x_2, 4):
             y_2 = 0
             for term in range(len(poly)):
+                if (poly[term][0] == "" and poly[term][1] == "" and
+                    poly[term][2] == "" and poly[term][4] == "" and
+                    poly[term][5] == "" and poly[term][6] == ""):
+                    if poly[term][3] == "":
+                        y_2 += x_2
+                    else:
+                        y_2 -= x_2
                 if poly[term][2] != "" and poly[term][1] != "":
                     value = x_2 * x_2 * float(poly[term][1])
                     if poly[term][0] == "":
@@ -194,7 +159,7 @@ elif max(orders) > 1:
                         y_2 += value
                     else:
                         y_2 -= value
-            print "({}, {})".format(x_2, y_2)
+            print "({}, {})".format(float(x_2), float(y_2))
             
 elif max(orders) > 0:
     try:
@@ -215,5 +180,5 @@ elif max(orders) > 0:
                 y += value
             else:
                 y -= value
-    print "({}, {})".format(x, y)
+    print "({}, {})".format(float(x), float(y))
 
